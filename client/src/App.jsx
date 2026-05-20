@@ -1,143 +1,170 @@
-import Navbar from "./components/Navbar";
-import Ridecard from "./components/Ridecard";
-import Footer from "./components/footer";
-
-/*function App() {
+/*
+function App() {
+  const rides = [
+    {
+      source: "Delhi",
+      destination: "Noida",
+      price: 300,
+    },
+    {
+      source: "Delhi",
+      destination: "Gurgaon",
+      price: 450,
+    },
+    {
+      source: "Noida",
+      destination: "Faridabad",
+      price: 500,
+    },
+  ];
 
   return (
-    <div>
-      <Navbar />
+    <div className="min-h-screen bg-gray-100">
+      
+      <nav className="bg-black text-white p-5 flex justify-between">
+        <h1 className="text-2xl font-bold">
+          RideApp 🚖
+        </h1>
 
-      <section
-        style={{
-          padding: "30px",
-        }}
-      >
-        <h1>Available Rides 🚖</h1>
+        <div className="flex gap-5">
+          <p>Home</p>
+          <p>Login</p>
+          <p>Create Ride</p>
+        </div>
+      </nav>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginTop: "20px",
-          }}
-        >
-          <Ridecard city="Delhi → Noida" price="300" driver="Raj" car="Swift" rating="4.5" />
+      <section className="text-center py-16 px-5">
+        <h1 className="text-black md:text-6xl font-bold">
+          Book Rides Easily 🚀
+        </h1>
 
-          <Ridecard city="Delhi → Gurgaon" price="450" driver="Nischal" car="Honda City" rating="4.7" />
+        <p className="mt-5 text-gray-600 text-lg">
+          Fast, affordable and comfortable rides.
+        </p>
 
-          <Ridecard city="Noida → Faridabad" price="500" driver="Praveen" car="Toyota Innova" rating="4.8" />
+        <div className="mt-8 flex justify-center gap-5">
+          <button className="bg-black text-white px-6 py-3 rounded-lg hover:scale-105 transition">
+            Book Ride
+          </button>
+
+          <button className="border border-black px-6 py-3 rounded-lg">
+            Learn More
+          </button>
         </div>
       </section>
 
-      <Footer />
-    </div>
-  );
-}
+    
+      <section className="px-5 pb-10">
+        <h2 className="text-3xl font-bold mb-8">
+          Available Rides
+        </h2>
 
-export default App;*/
-/*
-import { useState } from "react";
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {rides.map((ride) => (
+            <div className="bg-white p-5 rounded-2xl shadow-lg">
+              <h3 className="text-2xl font-semibold">
+                {ride.source} → {ride.destination}
+              </h3>
 
-function App() {
-  const [count, setCount] = useState(0); count is a state variable that holds the current count value, and setCount is a function that allows us to update the count. The initial value of count is set to 0.
+              <p className="mt-3 text-gray-600">
+                Price: ₹{ride.price}
+              </p>
 
-  return (
-    <div>
-      <h1>{count}</h1> 
-
-      <button onClick={() => setCount(count + 1)}> When the button is clicked, the onClick event handler is triggered, which calls the setCount function with the new value of count (current count + 1). This updates the count state variable, causing the component to re-render and display the updated count value.
-        Increase
-      </button>
-    </div>
-  );
-}
-
-export default App; 
-*/
-/*
-import { useState } from "react";
-
-function App() {
-  const [name, setName] = useState("");
-
-  return (
-    <div>
-      <h1>Login Form</h1>
-
-      <input
-        type="text"
-        placeholder="Enter name"
-        value={name}
-        onChange={(e) => setName(e.target.value)} on change 
-      />
-
-      <p>Hello {name}</p>
+              <button className="mt-5 bg-green-600 text-white px-5 py-2 rounded-lg">
+                Ride Now
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
 export default App;
 */
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function App() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [rides, setRides] = useState([]);
+
+  const fetchRides = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/rides"
+      );
+
+      setRides(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // DELETE FUNCTION
+  const deleteRide = async (id) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/ride/${id}`
+      );
+
+      // Refresh rides after delete
+      fetchRides();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRides();
+  }, []);
 
   return (
-    <div
-      style={{
-        padding: "40px",
-        maxWidth: "400px",
-        margin: "auto",
-      }}
-    >
-      <h1>Login Form 🔐</h1>
+    <div style={{ padding: "30px" }}>
+      <h1>Available Rides 🚖</h1>
 
-      <input
-        type="text"
-        placeholder="Enter Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+      <div
         style={{
-          display: "block",
-          marginBottom: "15px",
-          padding: "10px",
-          width: "100%",
-          borderRadius: "10px",
-        }}
-      />
-
-      <input
-        type="email"
-        placeholder="Enter Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{
-          display: "block",
-          marginBottom: "15px",
-          padding: "10px",
-          width: "100%",
-          borderRadius: "10px",
-        }}
-      />
-
-      <button
-        style={{
-          padding: "10px 20px",
+          display: "flex",
+          gap: "20px",
+          flexWrap: "wrap",
         }}
       >
-        Login
-      </button>
+        {rides.map((ride) => (
+          <div
+            key={ride._id}
+            style={{
+              border: "1px solid gray",
+              padding: "20px",
+              width: "220px",
+              borderRadius: "10px",
+            }}
+          >
+            <h2>
+              {ride.source} → {ride.destination}
+            </h2>
 
-      <hr />
+            <p>Price: ₹{ride.price}</p>
 
-      <h2>Entered Data</h2>
+            <p>Seats: {ride.seats}</p>
 
-      <p>Name: {name}</p>
-
-      <p>Email: {email}</p>
+            <button
+              onClick={() => deleteRide(ride._id)}
+              style={{
+                marginTop: "10px",
+                backgroundColor: "red",
+                color: "white",
+                border: "none",
+                padding: "10px",
+                cursor: "pointer",
+              }}
+            >
+              Delete Ride
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
